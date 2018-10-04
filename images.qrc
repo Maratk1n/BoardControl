@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/application-exit.png</file>
+        <file>images/clear.png</file>
+        <file>images/connect.png</file>
+        <file>images/disconnect.png</file>
+        <file>images/graph.png</file>
+        <file>images/settings.png</file>
+        <file>images/data-exchange.png</file>
+    </qresource>
+</RCC>
