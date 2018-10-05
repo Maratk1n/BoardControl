@@ -8,6 +8,7 @@
 #include <QTextCodec>
 #include <QScrollBar>
 #include <QDateTime>
+#include <QBitArray>
 
 QVariant str2QVariant(const QString &type)
 {
@@ -26,6 +27,25 @@ QVariant str2QVariant(const QString &type)
     return QVariant(QMetaType::UChar, nullptr);
 }
 
+unsigned int bitsCount(const QString &type)
+{
+    unsigned int byte = 8;
+    if (QString("uint8_t") == type) {
+        return byte * sizeof(uint8_t);
+    }
+    else if (QString("uint16_t") == type) {
+        return byte * sizeof(uint16_t);
+    }
+    else if (QString("int16_t") == type) {
+        return byte * sizeof(int16_t);
+    }
+    else if (QString("float") == type) {
+        return byte * sizeof(float);
+    }
+    return 0;
+}
+
+
 Device::Device(QObject *parent) : QObject(parent)
 {
 
@@ -39,29 +59,34 @@ Device::~Device()
 void Device::setRDataType(QVariant dataType, bool inverted)
 {
     if (reqType == kHEXStandart) {
+        unsigned int byte = 8;
         switch (static_cast<QMetaType::Type>(dataType.type())) {
         case QMetaType::UChar: { //uint8_t
             totalSize += sizeof(uint8_t);
+            r_bitsArray.append(QBitArray(byte * sizeof(uint8_t)));
             break;
         }
         case QMetaType::UShort: { //uint16_t
             totalSize += sizeof(uint16_t);
+            r_bitsArray.append(QBitArray(byte * sizeof(uint16_t)));
             break;
         }
         case QMetaType::Short: { //int16_t
             totalSize += sizeof(int16_t);
+            r_bitsArray.append(QBitArray(byte * sizeof(int16_t)));
             break;
         }
         case QMetaType::Float:{ //float
             totalSize += sizeof(float);
+            r_bitsArray.append(QBitArray(byte * sizeof(float)));
             break;
         }
         default:
             break;
         }
+        r_data.append(dataType);
+        r_inverse.append(inverted);
     }
-    r_data.append(dataType);
-    r_inverse.append(inverted);
 }
 
 void Device::setRequest(const QByteArray &request)
@@ -145,6 +170,14 @@ requestType Device::getReqType()
     return reqType;
 }
 
+QBitArray Device::getBitArray(unsigned int id)
+{
+    if ((unsigned int)r_bitsArray.size() > id){
+        return r_bitsArray[id];
+    }
+    return QBitArray();
+}
+
 void Device::addLog(const QString &text, bool labelUpdate, bool timeStamp)
 {
     QString log;
@@ -195,13 +228,17 @@ void Device::packageAnalysis()
                     array[k] = response[currentPos++];
                 }
             }
-
+            int byteSize = 8;
             switch (static_cast<QMetaType::Type>(r_data[i].type())) {
             case QMetaType::UChar: { //uint8_t
                 uint8_t data;
                 memcpy(&data, array, sizeof(array));
                 r_data[i] = QVariant::fromValue(data);
                 dataText += QString("Data%1: %2; ").arg(i+1).arg(r_data[i].toUInt());
+                for (unsigned int b = 0; b < byteSize * sizeof(uint8_t); b++) {
+                    if ((unsigned int)r_bitsArray.at(i).size() <= b) return;
+                    r_bitsArray[i][b] = (data >> b) & 1 ? true : false;
+                }
                 break;
             }
             case QMetaType::UShort: { //uint16_t
@@ -209,6 +246,10 @@ void Device::packageAnalysis()
                 memcpy(&data, array, sizeof(array));
                 r_data[i] = QVariant::fromValue(data);
                 dataText += QString("Data%1: %2; ").arg(i+1).arg(r_data[i].toUInt());
+                for (unsigned int b = 0; b < byteSize * sizeof(uint16_t); b++) {
+                    if ((unsigned int)r_bitsArray.at(i).size() <= b) return;
+                    r_bitsArray[i][b] = (data >> b) & 1 ? true : false;
+                }
                 break;
             }
             case QMetaType::Short: { //int16_t
@@ -216,6 +257,10 @@ void Device::packageAnalysis()
                 memcpy(&data, array, sizeof(array));
                 r_data[i] = QVariant::fromValue(data);
                 dataText += QString("Data%1: %2; ").arg(i+1).arg(r_data[i].toInt());
+                for (unsigned int b = 0; b < byteSize * sizeof(int16_t); b++) {
+                    if ((unsigned int)r_bitsArray.at(i).size() <= b) return;
+                    r_bitsArray[i][b] = (data >> b) & 1 ? true : false;
+                }
                 break;
             }
             case QMetaType::Float:{ //float

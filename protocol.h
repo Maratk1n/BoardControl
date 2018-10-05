@@ -38,6 +38,7 @@ enum requestType {kHEXStandart, kHEXCustom, kASCII};
 //typedef unsigned long int       uint64_t;
 
 QVariant str2QVariant(const QString &type);
+unsigned int bitsCount(const QString &type);
 
 class Device : public QObject {
     Q_OBJECT
@@ -45,8 +46,9 @@ class Device : public QObject {
     QByteArray request;
     QByteArray response;
     QVector<QVariant> r_data;
+    QVector<QBitArray> r_bitsArray;
     QVector<bool> r_inverse; // обратный порядок байт
-    requestType reqType;
+    requestType reqType = kHEXStandart;
     Settings portSettings;
     QLabel *label = nullptr;
     QListWidget *listWidget = nullptr;
@@ -71,6 +73,7 @@ public:
     QByteArray getResponse();
     QVariant getRData(unsigned int id);
     requestType getReqType();
+    QBitArray getBitArray(unsigned int id);
 private slots:
     void addLog(const QString &text, bool labelUpdate = false, bool timeStamp = true);
     void packageAnalysis();

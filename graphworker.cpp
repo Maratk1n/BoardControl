@@ -7,8 +7,9 @@ GraphWorker::GraphWorker(QWidget *parent) : QCustomPlot(parent)
 {
     connect(this, SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseMove(QMouseEvent*)));
     this->addGraph();
-    this->xAxis->setLabel("Время, []");
+    this->xAxis->setLabel("Время, [мин]");
     this->yAxis->setLabel("Значение");
+    this->xAxis->setRange(0, 30); // 30 min
 
     QAction *autoscale = new QAction("autoscale", this);
     connect(autoscale, static_cast<void (QAction::*)(bool)>(&QAction::triggered), this, [this](){

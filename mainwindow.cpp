@@ -97,7 +97,7 @@ void MainWindow::dataProcessing()
             graphPairs.value(it)->setData(device->getRData(it).toFloat());
         }
         for (auto it : bitMapper.keys()) {
-
+            bitMapper.value(it)->setBitArray(device->getBitArray(it));
         }
     }
 }
@@ -194,7 +194,9 @@ void MainWindow::on_actionConnect_triggered()
                     graphPairs.insert(i, grW);
                 }
                 if (bitwise->isChecked()) { // bit representation needed
-                    BitMappings *bM = new BitMappings(this);
+                    ui->bitsIndicate->show();
+                    BitMappings *bM = new BitMappings(i, bitsCount(dataType->currentText()), this);
+                    ui->bitsIndicate->layout()->addWidget(bM);
                     // добавляем битовую карту
                     bitMapper.insert(i, bM);
                 }
@@ -245,6 +247,7 @@ void MainWindow::on_actionDisconnect_triggered()
     ui->actionConnect->setEnabled(true);
     ui->protocolSettings->setEnabled(true);
     ui->actionSettings->setEnabled(true);
+    ui->bitsIndicate->hide();
 }
 
 void MainWindow::on_hex_select_toggled(bool checked)

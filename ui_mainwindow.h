@@ -54,6 +54,7 @@ public:
     QGridLayout *gridLayout_3;
     QLabel *helpLabel;
     QGroupBox *bitsIndicate;
+    QVBoxLayout *verticalLayout_7;
     QGroupBox *protocolSettings;
     QVBoxLayout *verticalLayout_3;
     QWidget *horizontalWidget;
@@ -92,8 +93,8 @@ public:
     QMenu *menu;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
-    QButtonGroup *buttonGroup_2;
     QButtonGroup *buttonGroup;
+    QButtonGroup *buttonGroup_2;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -141,7 +142,7 @@ public:
         helper->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QStringLiteral("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 818, 184));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 818, 176));
         gridLayout_3 = new QGridLayout(scrollAreaWidgetContents);
         gridLayout_3->setSpacing(6);
         gridLayout_3->setContentsMargins(11, 11, 11, 11);
@@ -164,6 +165,11 @@ public:
 
         bitsIndicate = new QGroupBox(centralWidget);
         bitsIndicate->setObjectName(QStringLiteral("bitsIndicate"));
+        verticalLayout_7 = new QVBoxLayout(bitsIndicate);
+        verticalLayout_7->setSpacing(6);
+        verticalLayout_7->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_7->setObjectName(QStringLiteral("verticalLayout_7"));
+        verticalLayout_7->setContentsMargins(4, 3, 4, 3);
 
         verticalLayout_2->addWidget(bitsIndicate);
 
