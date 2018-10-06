@@ -32,8 +32,10 @@ enum requestType {kHEXStandart, kHEXCustom, kASCII};
 
 //для справки
 //typedef unsigned char           uint8_t;  QMetaType::UChar
+//                                int8_t;   QMetaType::SChar
 //typedef unsigned short          uint16_t; QMetaType::UShort
-//typedef unsigned int            uint32_t;
+//typedef unsigned int            uint32_t; QMetaType::UInt
+//                                int32_t;  QMetaType::Int
 //                                int16_t;  QMetaType::Short
 //typedef unsigned long int       uint64_t;
 
@@ -57,6 +59,7 @@ class Device : public QObject {
     QThread *thread = nullptr;
     size_t totalSize = 0;
     bool anyResponse = false;
+    const size_t byteSize = 8; //bits
 public:
     Device(QObject *parent = 0);
     ~Device();

@@ -406,7 +406,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>AB010300</string>
+                <string/>
                </property>
               </widget>
              </item>
@@ -650,7 +650,7 @@
  </resources>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>

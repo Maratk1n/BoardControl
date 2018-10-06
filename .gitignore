@@ -3,3 +3,4 @@ release/
 BoardControl.pro.user
 object_script*
 Makefile*
+config.ini

@@ -93,8 +93,8 @@ public:
     QMenu *menu;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
-    QButtonGroup *buttonGroup;
     QButtonGroup *buttonGroup_2;
+    QButtonGroup *buttonGroup;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -433,7 +433,7 @@ public:
         cycleSend->setText(QApplication::translate("MainWindow", "\320\246\320\270\320\272\320\273\320\270\321\207\320\275\320\260\321\217 \320\276\321\202\320\277\321\200\320\260\320\262\320\272\320\260", nullptr));
         label_2->setText(QApplication::translate("MainWindow", "\320\230\320\275\321\202\320\265\321\200\320\262\320\260\320\273:", nullptr));
         label_3->setText(QApplication::translate("MainWindow", "\320\274\321\201", nullptr));
-        requestLineEdit->setText(QApplication::translate("MainWindow", "AB010300", nullptr));
+        requestLineEdit->setText(QString());
         crcCheckBox->setText(QApplication::translate("MainWindow", "CRC", nullptr));
         answerBox->setTitle(QApplication::translate("MainWindow", "\320\236\321\202\320\262\320\265\321\202", nullptr));
         anyResp_chBox->setText(QApplication::translate("MainWindow", "\320\233\321\216\320\261\320\276\320\271 \320\276\321\202\320\262\320\265\321\202", nullptr));

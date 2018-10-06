@@ -7,12 +7,13 @@
 #include <QBitArray>
 
 
-class Circle : public QWidget
+class Circle : public QLabel
 {
     Q_OBJECT
     QBrush brush;
+    int id;
 public:
-    explicit Circle(QWidget *parent = nullptr);
+    Circle(unsigned int id, QWidget *parent = nullptr);
     ~Circle();
     void setBrush(QBrush brush);
 protected:

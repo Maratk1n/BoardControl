@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <libs/qcustomplot.h>
+#include <QSharedPointer>
 
 class GraphWorker : public QCustomPlot
 {
@@ -16,6 +17,11 @@ class GraphWorker : public QCustomPlot
     QMenu menu;
     float yMax = 0.0;
     float yMin = 0.0;
+    QSharedPointer<QCPAxisTickerDateTime> dateTicker{new QCPAxisTickerDateTime};
+    bool showHour = false;
+    const int lastStorageTime = 3600; // sec
+    const int defaultWidth = 120; // sec
+    int displayWidth = defaultWidth; // sec
 public:
     explicit GraphWorker(QWidget *parent = nullptr);
     ~GraphWorker();
@@ -27,6 +33,7 @@ public slots:
 
 private slots:
     void mouseMove(QMouseEvent* event);
+    void scroll(QWheelEvent* event);
 };
 
 #endif // GRAPHWORKER_H

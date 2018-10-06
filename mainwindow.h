@@ -7,6 +7,7 @@
 #include "settingsdialog.h"
 #include "graphworker.h"
 #include "bitmappings.h"
+#include <QSettings>
 
 namespace Ui {
 class MainWindow;
@@ -56,6 +57,7 @@ private:
 
     QMap<int, GraphWorker*> graphPairs;
     QMap<int, BitMappings*> bitMapper;
+    QString configName = "config.ini";
 };
 
 #endif // MAINWINDOW_H

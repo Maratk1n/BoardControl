@@ -1,10 +1,15 @@
 #include "bitmappings.h"
 #include <QHBoxLayout>
 #include <QDebug>
+//#include <qapplication.h>
 
-Circle::Circle(QWidget *parent) : QWidget(parent)
+Circle::Circle(unsigned int id, QWidget *parent) : QLabel(parent)
 {
-    this->setFixedHeight(24);
+    this->id = id;
+    setFixedSize(20, 20);
+    setAlignment(Qt::AlignCenter);
+    setText(QString("%1").arg(id));
+    //qApp->processEvents();
 }
 
 Circle::~Circle()
@@ -21,28 +26,32 @@ void Circle::setBrush(QBrush brush)
 void Circle::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event);
+
     QPainter painter(this);
     painter.setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::FlatCap));
     painter.setBrush(brush);
-    painter.drawEllipse(QPoint(12, 12), 8, 8);
+    painter.drawEllipse(QPoint(10, 10), 9, 9);
 }
 
 
 
 BitMappings::BitMappings(unsigned int id, unsigned int bitsCount, QWidget *parent) : QWidget(parent)
 {
-    this->setFixedHeight(35);
+    this->setFixedHeight(22);
     label.setText(QString("Data %1:\t").arg(id + 1));
-    label.setFixedHeight(24);
-    label.setAlignment(Qt::AlignLeft);
+    label.setFixedHeight(20);
+    label.setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     QHBoxLayout *layout = new QHBoxLayout(this);
+
+    layout->setAlignment(Qt::AlignVCenter);
     //layout->setAlignment(Qt::AlignLeft | Qt::AlignHCenter);
     layout->addWidget(&label);
-    layout->setContentsMargins(3, 3, 3, 3);
-    bitsCount = bitsCount > 16 ? 0 : bitsCount;
-    for (unsigned int i = 0; i < bitsCount; i++) {
-        circles.append(new Circle(this)); // widget for circle
+    layout->setContentsMargins(1, 1, 1, 1);
+    layout->addItem(new QSpacerItem(0, 18, QSizePolicy::Expanding, QSizePolicy::Fixed));
+    for (int i = bitsCount - 1; i >= 0; i--) {
+        circles.append(new Circle(i, this)); // widget for circle
         layout->addWidget(circles.last());
+        layout->addItem(new QSpacerItem(0, 18, QSizePolicy::Expanding, QSizePolicy::Fixed));
     }
     this->setLayout(layout);
 }
