@@ -276,6 +276,9 @@ void MainWindow::on_actionDisconnect_triggered()
     }
     bitMapper.clear();
 
+    QLabel *label = ui->statusBar->findChildren<QLabel*>().last();
+    label->clear();
+
     ui->actionConnect->setEnabled(true);
     ui->protocolSettings->setEnabled(true);
     ui->actionSettings->setEnabled(true);

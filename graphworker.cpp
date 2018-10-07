@@ -3,22 +3,150 @@
 
 QLabel *GraphWorker::label = nullptr;
 
+
+template<class Key, class Value>
+GraphData<Key, Value>::GraphData()
+{
+
+}
+
+template<class Key, class Value>
+QVector<Key> &GraphData<Key, Value>::keys()
+{
+    return xScale;
+}
+
+template<class Key, class Value>
+QVector<Value> &GraphData<Key, Value>::values()
+{
+    return yScale;
+}
+
+template<class Key, class Value>
+edge<Key> GraphData<Key, Value>::getKeyEdge()
+{
+    return xEdge;
+}
+
+template<class Key, class Value>
+edge<Value> GraphData<Key, Value>::getValueEdge()
+{
+    return yEdge;
+}
+
+template<class Key, class Value>
+void GraphData<Key, Value>::scroll(int angleDelta)
+{
+    if (xScale.isEmpty()) return;
+    if (xScale.last() < defaultWidth) return;
+
+    displayWidth += angleDelta / 6; // angleDelta = +-120
+    int maxWidth = xScale.last() - xScale.first();
+    displayWidth = displayWidth > maxWidth ? maxWidth : displayWidth;
+    displayWidth = displayWidth < defaultWidth ? defaultWidth : displayWidth;
+}
+
+template<class Key, class Value>
+void GraphData<Key, Value>::autoScroll()
+{
+    displayWidth = defaultWidth;
+}
+
+template<class Key, class Value>
+void GraphData<Key, Value>::appendPoint(const Key &key, const Value &value)
+{
+
+    if (yScale.isEmpty()) {
+        yEdge.min = value;
+        yEdge.max = value;
+    }
+
+    xScale.append(key);
+    yScale.append(value);
+
+    // calc range of X scale
+    if ((xScale.last() - xScale.at(borderPos)) < displayWidth) { // если надо расширить график
+        for ( ; borderPos >= 0; borderPos--) {
+            if ((xScale.last() - xScale.first()) < defaultWidth) break;
+            if (yScale.at(borderPos) < yEdge.min) {
+                yEdge.min = yScale.at(borderPos);
+                minPos = borderPos;
+            }
+            if (yScale.at(borderPos) > yEdge.max) {
+                yEdge.max = yScale.at(borderPos);
+                maxPos = borderPos;
+            }
+            if ((xScale.last() - xScale.at(borderPos)) >= displayWidth) break;
+        }
+    }
+    else { // сжать график
+        for ( ; borderPos < xScale.size(); borderPos++) {
+            if ((xScale.last() - xScale.at(borderPos)) <= displayWidth) break;
+        }
+        if (borderPos > minPos) { // минимальная точка ушла в небытие
+            yEdge.min = yScale.at(borderPos);
+            minPos = borderPos;
+            for (int i = borderPos; i < yScale.size(); i++) {
+                if (yScale.at(i) <= yEdge.min) {
+                    yEdge.min = yScale.at(i);
+                    minPos = i;
+                }
+            }
+        }
+        if (borderPos > maxPos) { // максимальная точка ушла в небытие
+            yEdge.max = yScale.at(borderPos);
+            maxPos = borderPos;
+            for (int i = borderPos; i < yScale.size(); i++) {
+                if (yScale.at(i) >= yEdge.max) {
+                    yEdge.max = yScale.at(i);
+                    maxPos = i;
+                }
+            }
+        }
+    }
+    xEdge.min = xScale.at(borderPos);
+    xEdge.max = xScale.last();
+
+    // calc range of Y scale
+    if (value < yEdge.min) {
+        yEdge.min = value;
+        minPos = xScale.size() - 1;
+    }
+    if (value > yEdge.max) {
+        yEdge.max = value;
+        maxPos = xScale.size() - 1;
+    }
+
+    if ((xScale.last() - xScale.first()) > lastStorageTime) {
+        xScale.pop_front();
+        minPos--;
+        maxPos--;
+    }
+}
+
+template<class Key, class Value>
+GraphData<Key, Value>::~GraphData()
+{
+
+}
+
+
 GraphWorker::GraphWorker(QWidget *parent) : QCustomPlot(parent)
 {
     connect(this, SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseMove(QMouseEvent*)));
     connect(this, SIGNAL(mouseWheel(QWheelEvent*)), this, SLOT(scroll(QWheelEvent*)));
     this->addGraph();
-    this->xAxis->setLabel("Время, [ч:мин]");
+    this->xAxis->setLabel("Время, [ч:мин:с]");
     this->yAxis->setLabel("Значение");
 
     // настройка показа времени на шкале
     dateTicker->setDateTimeSpec(Qt::UTC);
-    dateTicker->setDateTimeFormat("H:mm");
+    dateTicker->setDateTimeFormat("H:mm:ss");
     this->xAxis->setTicker(dateTicker);
 
     QAction *autoscale = new QAction("autoscale", this);
     connect(autoscale, static_cast<void (QAction::*)(bool)>(&QAction::triggered), this, [this](){
-        displayWidth = defaultWidth;
+        data_.autoScroll();
     });
     menu.addAction(autoscale);
     connect(this, static_cast<void (QCustomPlot::*)(QMouseEvent*)>(&QCustomPlot::mousePress), this, [this](QMouseEvent* event){
@@ -54,46 +182,24 @@ void GraphWorker::setData(float data)
     delta_t /= 1000; // ms to sec
     //delta_t *= 50;
 
-    if (xScale.isEmpty()) {
-        xScale.append(delta_t);
-        yMin = data;
-        yMax = data;
+    if (data_.keys().isEmpty()) {
+        data_.appendPoint(delta_t, data);
     }
     else {
-        xScale.append(xScale.last() + delta_t);
-    }
-    yScale.append(data);
-
-    // save just lastStorageTime sec
-    if (xScale.last() - xScale.first() > lastStorageTime) {
-        xScale.pop_front();
+        data_.appendPoint(data_.keys().last() + delta_t, data);
     }
 
-    yMin = data < yMin ? data : yMin;
-    yMax = data > yMax ? data : yMax;
+    this->graph(0)->setData(data_.keys(), data_.values());
 
-//    if (!showHour && xScale.last() > 3590.0) {
-//        showHour = true;
-//        this->xAxis->setLabel("Время, [ч:мин]");
-//        dateTicker->setDateTimeFormat("hh:mm");
-//    }
-
-    this->graph(0)->setData(xScale, yScale);
     step++;
     if (step > replotInterval) {
         step = 0;
 
-        // set yAxis range
-        float bias = yMax - yMin;
-        this->yAxis->setRange(yMin - 0.05*bias, yMax + 0.05*bias);
+        // set ranges
+        this->xAxis->setRange(data_.getKeyEdge().min, data_.getKeyEdge().max);
+        this->yAxis->setRange(data_.getValueEdge().min - data_.getValueEdge().bias() * 0.05,
+                              data_.getValueEdge().max + data_.getValueEdge().bias() * 0.05);
 
-        // set xAxis range
-        if (xScale.last() < defaultWidth) {
-            this->xAxis->setRange(xScale.first(), xScale.last());
-        }
-        else {
-            this->xAxis->setRange(xScale.last() - displayWidth, xScale.last());
-        }
         this->replot();
     }
 }
@@ -103,17 +209,11 @@ void GraphWorker::mouseMove(QMouseEvent *event)
     if (label != nullptr) {
         double x = this->xAxis->pixelToCoord(event->pos().x());
         double y = this->yAxis->pixelToCoord(event->pos().y());
-        label->setText(QString("X: %1 [ч:мин:с],\tY: %2").arg(QDateTime::fromTime_t(x).toUTC().toString("H:mm:ss")).arg(QString::number(y, 'g', 4)));
+        label->setText(QString("X: %1 [ч:мин:с],\tY: %2").arg(QDateTime::fromTime_t(x).toUTC().toString("H:mm:ss")).arg(QString::number(y, 'f', 2)));
     }
 }
 
 void GraphWorker::scroll(QWheelEvent *event)
 {
-    if (xScale.isEmpty()) return;
-    if (xScale.last() < defaultWidth) return;
-
-    displayWidth += event->angleDelta().ry() / 6; // event->angleDelta().rx() = +-120
-    int width = xScale.last() - xScale.first();
-    displayWidth = displayWidth > width ? width : displayWidth;
-    displayWidth = displayWidth < defaultWidth ? defaultWidth : displayWidth;
+    data_.scroll(event->angleDelta().ry());
 }
