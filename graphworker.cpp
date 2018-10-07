@@ -55,14 +55,26 @@ void GraphData<Key, Value>::autoScroll()
 template<class Key, class Value>
 void GraphData<Key, Value>::appendPoint(const Key &key, const Value &value)
 {
-
     if (yScale.isEmpty()) {
         yEdge.min = value;
         yEdge.max = value;
+        minPos = 0;
+        maxPos = 0;
+        borderPos = 0;
     }
 
     xScale.append(key);
     yScale.append(value);
+
+    // calc range of Y scale
+    if (value < yEdge.min) {
+        yEdge.min = value;
+        minPos = xScale.size() - 1;
+    }
+    if (value > yEdge.max) {
+        yEdge.max = value;
+        maxPos = xScale.size() - 1;
+    }
 
     // calc range of X scale
     if ((xScale.last() - xScale.at(borderPos)) < displayWidth) { // если надо расширить график
@@ -106,16 +118,6 @@ void GraphData<Key, Value>::appendPoint(const Key &key, const Value &value)
     }
     xEdge.min = xScale.at(borderPos);
     xEdge.max = xScale.last();
-
-    // calc range of Y scale
-    if (value < yEdge.min) {
-        yEdge.min = value;
-        minPos = xScale.size() - 1;
-    }
-    if (value > yEdge.max) {
-        yEdge.max = value;
-        maxPos = xScale.size() - 1;
-    }
 
     if ((xScale.last() - xScale.first()) > lastStorageTime) {
         xScale.pop_front();
@@ -180,7 +182,6 @@ void GraphWorker::setData(float data)
     }
 
     delta_t /= 1000; // ms to sec
-    //delta_t *= 50;
 
     if (data_.keys().isEmpty()) {
         data_.appendPoint(delta_t, data);
