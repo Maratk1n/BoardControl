@@ -4,6 +4,8 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "uint24.h"
+#include "help.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -33,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->setVerticalHeaderLabels(QStringList() << "Формат \nданных" << "Инвертированный \nпорядок байт" << "Отрисовывать \nграфик" << "Побитовое \nпредставление");   // Задает имя строк
     /* Выполняем заполнение QTableWidget записями
      * */
-    QStringList dataTypes = QStringList() << "uint8_t" << "int8_t" << "uint16_t" << "int16_t" << "uint32_t" << "int32_t" << "float";
+    QStringList dataTypes = QStringList() << "uint8_t" << "int8_t" << "uint16_t" << "int16_t" << "uint24" << "uint32_t" << "int32_t" << "float";
     for(int i = 0; i < dataCount; i++){
         ui->tableWidget->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Stretch);
         // Создаём элемент, который будет выполнять роль чекбокса
@@ -62,53 +64,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->resizeColumnsToContents();
     ui->tableWidget->resizeRowsToContents();
 
-    ui->helpLabel->setText("Порядок работы с программой Board Control:\n\n"
-                           "1. Настройка COM-порта\n"
-                           "\tВо время запуска программы открывается окно выбора параметров COM-порта.\n"
-                           "\tНеобходимо выбрать порт и желаемый BaudRate и нажать кнопку 'Принять'.\n"
-                           "\tПри необходимости смены настроек порта можно открыть окно через вкладку 'COM port'\n"
-                           "\tили нажатием на шестеренку.\n"
-                           "\t\n"
-                           "2. Настройка протокола\n"
-                           "\t\n"
-                           "\t[Выбор типа данных]\n"
-                           "\tНужно выбрать HEX формат (шестнадцатеричный) или ASCII (строковый), например, для работы\n"
-                           "\tс датчиком Thyracont Pirani. В режиме ASCII доступны только следующие параметры:\n"
-                           "\tцикличная отправка, интервал цикличной отправки (мс), ввод запроса.\n"
-                           "\t\n"
-                           "\t[Выбор протокола]\n"
-                           "\tВ HEX режиме можно выбрать стандартный протокол Измерителя, либо уникальный, но в этом случае\n"
-                           "\tстанут недоступными следующие поля: CRC (контрольная сумма), ответ.\n"
-                           "\t\n"
-                           "\t[Запрос]\n"
-                           "\tЦикличная отправка посылает на выбранный порт запрос с интервалом N (100-1000) миллисекунд.\n"
-                           "\tВыбранный параметр CRC добавляет к запросу байт контрольной суммы в соответствии с протоколом.\n"
-                           "\t\n"
-                           "\t[Ответ]\n"
-                           "\tДанное поле доступно только в режиме HEX -- Стандартный (Измеритель).\n"
-                           "\tПри выборе параметра 'Любой ответ' деактивируется формирование ответа. Программа будет сверять\n"
-                           "\tтолько контрольную сумму.\n"
-                           "\tЕсли снять галочку с поля 'Любой ответ' появится возможность сформировать ответ:\n"
-                           "\t-- Необходимо выбрать количество данных, например, если ожидается один float и два uint8_t, нужно выбрать 3.\n"
-                           "\t    Данные нумеруются от маски: (Маска)(Адрес)(Функция)(Размер)(Data 1)..(Data N)(ChkSum)\n"
-                           "\t-- Порядок байт: по умолчанию big-endian, если поставить галочку, станет little-endian\n"
-                           "\t-- График: активирует рисование графика для текущего Data в режиме реального времени\n"
-                           "\t-- Побитовое представление: отображает текущее Data в виде последовательности бит (всегда big-endian). Недоступно для float.\n"
-                           "\t\n"
-                           "3. Запуск обмена данными\n"
-                           "\tОбмен запускается нажатием на кнопку 'Start' во вкладке 'COM port'. Порт автоматически откроется и начнется запись/чтение.\n"
-                           "\tОстановить можно нажатием на кнопку 'Stop'. Порт закроется.\n"
-                           "\tВНИМАНИЕ! После остановки все графики и битовая индикация данных текущей сессии удаляются.\n"
-                           "\t\n"
-                           "4. Логгирование данных\n"
-                           "\tДанные обмена и другую информацию по процессу чтения/записи можно посмотреть в окне 'Обмен данными'.\n"
-                           "\tОкно также открывается нажатием клавиш <Ctrl+D>\n"
-                           "\t\n"
-                           "5. Графики\n"
-                           "\tМасштабирование возможно только по оси абсцисс. По умолчанию ширина оси 120 секунд.\n"
-                           "\tМасштабирование можно активировать прокруткой ролика мыши. Вернутся к исходному состоянию можно прокруткой ролика в обратную\n"
-                           "\tсторону, либо нажать ПКМ -> 'autoscale'. Масштабирование по оси ординат автоматическое на протяжении всего времени.\n"
-                           "\t\n");
+    ui->helpLabel->setText(help);
 
     QTimer::singleShot(1, this, SLOT(on_actionSettings_triggered()));  //вывод окна ввода пользователя поверх главного окна
 }
@@ -122,7 +78,13 @@ void MainWindow::dataProcessing()
 {
     if (reqType == kHEXStandart) {
         for (auto it : graphPairs.keys()) {
-            graphPairs.value(it)->setData(device->getRData(it).toFloat());
+            if (std::string(device->getRData(it).typeName()) == std::string("uint24")) {
+                uint24 t = device->getRData(it).value<uint24>();
+                graphPairs.value(it)->setData(t.data);
+            }
+            else {
+                graphPairs.value(it)->setData(device->getRData(it).toFloat());
+            }
         }
         for (auto it : bitMapper.keys()) {
             bitMapper.value(it)->setBitArray(device->getBitArray(it));
@@ -219,13 +181,13 @@ void MainWindow::on_actionConnect_triggered()
                 QCheckBox *inversion = static_cast<QCheckBox*>(ui->tableWidget->cellWidget(1, i)->children().last());
                 QCheckBox *plot = static_cast<QCheckBox*>(ui->tableWidget->cellWidget(2, i)->children().last());
                 QCheckBox *bitwise = static_cast<QCheckBox*>(ui->tableWidget->cellWidget(3, i)->children().last());
-                device->setRDataType(str2QVariant(dataType->currentText()), inversion->isChecked());
-                if (plot->isChecked()) { // plot needed
+                device->setRDataType(str2QVariant(dataType->currentText()), inversion && inversion->isChecked());
+                if (plot && plot->isChecked()) { // plot needed
                     GraphWorker *grW = new GraphWorker(this);
                     ui->graphs->addTab(grW, QString("Data %1").arg(i + 1));
                     graphPairs.insert(i, grW);
                 }
-                if (bitwise->isChecked()) { // bit representation needed
+                if (bitwise && bitwise->isChecked()) { // bit representation needed
                     ui->bitsIndicate->show();
                     BitMappings *bM = new BitMappings(i, bitsCount(dataType->currentText()), this);
                     ui->bitsIndicate->layout()->addWidget(bM);

@@ -39,7 +39,9 @@ HEADERS += \
     dataexchange.h \
     settingsdialog.h \
     graphworker.h \
-    bitmappings.h
+    bitmappings.h \
+    uint24.h \
+    help.h
 
 FORMS += \
         mainwindow.ui \

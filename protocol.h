@@ -10,6 +10,7 @@
 #include <QLabel>
 #include <QListWidget>
 #include <QSerialPort>
+#include <QMetaType>
 
 class Connector;
 
@@ -29,6 +30,7 @@ struct Settings {
 };
 
 enum requestType {kHEXStandart, kHEXCustom, kASCII};
+
 
 //для справки
 //typedef unsigned char           uint8_t;  QMetaType::UChar
