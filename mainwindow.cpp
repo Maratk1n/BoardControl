@@ -76,7 +76,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::dataProcessing()
 {
-    if (reqType == kHEXStandart) {
+    if (device->isDataOk() && reqType == kHEXStandart) {
         for (auto it : graphPairs.keys()) {
             if (std::string(device->getRData(it).typeName()) == std::string("uint24")) {
                 uint24 t = device->getRData(it).value<uint24>();

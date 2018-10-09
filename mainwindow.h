@@ -46,7 +46,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     DataExchange dataLogger;
-    const int dataCount = 8;
+    const int dataCount = 10;
     const int rowCount = 4;
 
     Device *device = nullptr;

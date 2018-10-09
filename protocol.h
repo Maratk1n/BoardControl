@@ -62,6 +62,7 @@ class Device : public QObject {
     size_t totalSize = 0;
     bool anyResponse = false;
     const size_t byteSize = 8; //bits
+    bool dataOk = false;
 public:
     Device(QObject *parent = 0);
     ~Device();
@@ -79,6 +80,7 @@ public:
     QVariant getRData(unsigned int id);
     requestType getReqType();
     QBitArray getBitArray(unsigned int id);
+    bool isDataOk() const;
 private slots:
     void addLog(const QString &text, bool labelUpdate = false, bool timeStamp = true);
     void packageAnalysis();

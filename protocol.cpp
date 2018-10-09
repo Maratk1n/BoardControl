@@ -215,6 +215,11 @@ QBitArray Device::getBitArray(unsigned int id)
     return QBitArray();
 }
 
+bool Device::isDataOk() const
+{
+    return dataOk;
+}
+
 void Device::addLog(const QString &text, bool labelUpdate, bool timeStamp)
 {
     QString log;
@@ -242,10 +247,9 @@ void Device::addLog(const QString &text, bool labelUpdate, bool timeStamp)
 void Device::packageAnalysis()
 {
     if (connector == nullptr) return;
-    bool ok = false;
-    response = connector->getResponse(&ok);
+    response = connector->getResponse(&dataOk);
 
-    if (reqType == kHEXStandart && ok && !anyResponse) {
+    if (reqType == kHEXStandart && dataOk && !anyResponse) {
         if ((totalSize + 5) != static_cast<unsigned int>(response.size())) {
             addLog("\tНеверно настроен ответ платы", false, false);
             return;

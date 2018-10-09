@@ -7,7 +7,7 @@
 #include <QBitArray>
 
 
-class Circle : public QLabel
+class Circle : public QWidget
 {
     Q_OBJECT
     QBrush brush;

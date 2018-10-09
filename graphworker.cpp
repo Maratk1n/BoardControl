@@ -198,8 +198,17 @@ void GraphWorker::setData(float data)
 
         // set ranges
         this->xAxis->setRange(data_.getKeyEdge().min, data_.getKeyEdge().max);
-        this->yAxis->setRange(data_.getValueEdge().min - data_.getValueEdge().bias() * 0.05,
-                              data_.getValueEdge().max + data_.getValueEdge().bias() * 0.05);
+        if (data_.getValueEdge().min == 0.0 && data_.getValueEdge().max == 0.0) {
+            this->yAxis->setRange(-1.0, 1.0);
+        }
+        else if (data_.getValueEdge().bias() == 0.0) {
+            this->yAxis->setRange(data_.getValueEdge().min - 0.05 * fabs(data_.getValueEdge().min),
+                                  data_.getValueEdge().max + 0.05 * fabs(data_.getValueEdge().max));
+        }
+        else {
+            this->yAxis->setRange(data_.getValueEdge().min - data_.getValueEdge().bias() * 0.05,
+                                  data_.getValueEdge().max + data_.getValueEdge().bias() * 0.05);
+        }
 
         this->replot();
     }

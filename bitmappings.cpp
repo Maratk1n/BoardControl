@@ -1,15 +1,16 @@
 #include "bitmappings.h"
 #include <QHBoxLayout>
 #include <QDebug>
-//#include <qapplication.h>
 
-Circle::Circle(unsigned int id, QWidget *parent) : QLabel(parent)
+Circle::Circle(unsigned int id, QWidget *parent) : QWidget(parent)
 {
-    this->id = id;
-    setFixedSize(20, 20);
-    setAlignment(Qt::AlignCenter);
-    setText(QString("%1").arg(id));
-    //qApp->processEvents();
+    this->setFixedSize(20, 20);
+    QHBoxLayout *layout = new QHBoxLayout(this);
+    layout->setAlignment(Qt::AlignCenter);
+    layout->setContentsMargins(0, 0, 0, 0);
+    QLabel *label = new QLabel(QString("%1").arg(id));
+    layout->addWidget(label);
+    this->setLayout(layout);
 }
 
 Circle::~Circle()
@@ -49,7 +50,7 @@ BitMappings::BitMappings(unsigned int id, unsigned int bitsCount, QWidget *paren
     layout->setContentsMargins(1, 1, 1, 1);
     layout->addItem(new QSpacerItem(0, 18, QSizePolicy::Expanding, QSizePolicy::Fixed));
     for (int i = bitsCount - 1; i >= 0; i--) {
-        circles.append(new Circle(i, this)); // widget for circle
+        circles.append(new Circle(i)); // widget for circle
         layout->addWidget(circles.last());
         layout->addItem(new QSpacerItem(0, 18, QSizePolicy::Expanding, QSizePolicy::Fixed));
     }
