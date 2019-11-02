@@ -1,6 +1,10 @@
 debug/
 release/
 BoardControl.pro.user
+BoardControl_resource.rc
+.qmake.stash
 object_script*
 Makefile*
 config.ini
+ui_*.h
+*.autosave
