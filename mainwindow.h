@@ -8,6 +8,7 @@
 #include "graphworker.h"
 #include "bitmappings.h"
 #include <QSettings>
+#include "mathexpression.h"
 
 namespace Ui {
 class MainWindow;
@@ -43,11 +44,13 @@ private slots:
 
     void on_cycleSend_toggled(bool checked);
 
+    void mathButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     DataExchange dataLogger;
     const int dataCount = 10;
-    const int rowCount = 4;
+    const int rowCount = 5;
 
     Device *device = nullptr;
     SettingsDialog *settingsDialog;

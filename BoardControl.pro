@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui script
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets serialport printsupport
 
@@ -30,7 +30,9 @@ SOURCES += \
     dataexchange.cpp \
     settingsdialog.cpp \
     graphworker.cpp \
-    bitmappings.cpp
+    bitmappings.cpp \
+    mathbutton.cpp \
+    mathexpression.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -41,12 +43,15 @@ HEADERS += \
     graphworker.h \
     bitmappings.h \
     uint24.h \
-    help.h
+    help.h \
+    mathbutton.h \
+    mathexpression.h
 
 FORMS += \
         mainwindow.ui \
     dataexchange.ui \
-    settingsdialog.ui
+    settingsdialog.ui \
+    mathexpression.ui
 
 DISTFILES +=
 

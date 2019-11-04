@@ -26,7 +26,6 @@ struct Settings {
     QString stringStopBits;
     QSerialPort::FlowControl flowControl;
     QString stringFlowControl;
-    bool localEchoEnabled;
 };
 
 enum requestType {kHEXStandart, kHEXCustom, kASCII};
@@ -56,7 +55,7 @@ class Device : public QObject {
     Settings portSettings;
     QLabel *label = nullptr;
     QListWidget *listWidget = nullptr;
-    int maxWidgetSize = 200;
+    int maxWidgetSize = 2000;
     Connector *connector = nullptr;
     QThread *thread = nullptr;
     size_t totalSize = 0;

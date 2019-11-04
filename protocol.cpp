@@ -128,6 +128,7 @@ void Device::setRDataType(QVariant dataType, bool inverted)
 
 void Device::setRequest(const QByteArray &request)
 {
+    reqType = kHEXStandart;
     this->request = request;
 }
 

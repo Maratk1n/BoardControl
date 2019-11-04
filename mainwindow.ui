@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>852</width>
-    <height>754</height>
+    <height>798</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -54,7 +54,7 @@
              <x>0</x>
              <y>0</y>
              <width>818</width>
-             <height>176</height>
+             <height>190</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_3">
@@ -117,13 +117,13 @@
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>420</height>
+        <height>450</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>420</height>
+        <height>450</height>
        </size>
       </property>
       <property name="title">
@@ -437,13 +437,13 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>260</height>
+           <height>290</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>260</height>
+           <height>290</height>
           </size>
          </property>
          <property name="title">
@@ -457,16 +457,28 @@
            <number>4</number>
           </property>
           <property name="topMargin">
-           <number>4</number>
+           <number>0</number>
           </property>
           <property name="rightMargin">
            <number>4</number>
           </property>
           <property name="bottomMargin">
-           <number>4</number>
+           <number>0</number>
           </property>
           <item>
            <widget class="QCheckBox" name="anyResp_chBox">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>17</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>17</height>
+             </size>
+            </property>
             <property name="text">
              <string>Любой ответ</string>
             </property>
@@ -476,32 +488,32 @@
            <widget class="QWidget" name="responseWidget" native="true">
             <layout class="QVBoxLayout" name="verticalLayout_5">
              <property name="spacing">
-              <number>4</number>
+              <number>0</number>
              </property>
              <property name="leftMargin">
-              <number>4</number>
+              <number>0</number>
              </property>
              <property name="topMargin">
-              <number>4</number>
+              <number>0</number>
              </property>
              <property name="rightMargin">
-              <number>4</number>
+              <number>0</number>
              </property>
              <property name="bottomMargin">
-              <number>4</number>
+              <number>0</number>
              </property>
              <item>
               <widget class="QWidget" name="widget_2" native="true">
                <property name="minimumSize">
                 <size>
                  <width>0</width>
-                 <height>40</height>
+                 <height>25</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
                  <width>16777215</width>
-                 <height>40</height>
+                 <height>25</height>
                 </size>
                </property>
                <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -512,7 +524,7 @@
                  <number>4</number>
                 </property>
                 <property name="topMargin">
-                 <number>4</number>
+                 <number>0</number>
                 </property>
                 <property name="rightMargin">
                  <number>4</number>
@@ -538,13 +550,13 @@
                <property name="minimumSize">
                 <size>
                  <width>0</width>
-                 <height>170</height>
+                 <height>195</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
                  <width>16777215</width>
-                 <height>170</height>
+                 <height>195</height>
                 </size>
                </property>
               </widget>
@@ -650,7 +662,7 @@
  </resources>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>

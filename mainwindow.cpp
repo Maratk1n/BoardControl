@@ -1,11 +1,12 @@
 
-#include <QDebug>
 #include <QMetaType>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "uint24.h"
 #include "help.h"
+#include "mathbutton.h"
+#include <memory>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -32,14 +33,15 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     // Устанавливаем заголовки колонок
     ui->tableWidget->setHorizontalHeaderLabels(headers);
-    ui->tableWidget->setVerticalHeaderLabels(QStringList() << "Формат \nданных" << "Инвертированный \nпорядок байт" << "Отрисовывать \nграфик" << "Побитовое \nпредставление");   // Задает имя строк
+    ui->tableWidget->setVerticalHeaderLabels(QStringList() << "Формат \nданных" << "Инвертированный \nпорядок байт"
+                                             << "Отрисовывать \nграфик" << "Побитовое \nпредставление" << "Математический \nкоэффициент");
     /* Выполняем заполнение QTableWidget записями
      * */
     QStringList dataTypes = QStringList() << "uint8_t" << "int8_t" << "uint16_t" << "int16_t" << "uint24" << "uint32_t" << "int32_t" << "float";
     for(int i = 0; i < dataCount; i++){
         ui->tableWidget->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Stretch);
         // Создаём элемент, который будет выполнять роль чекбокса
-        for (int j = 1; j < rowCount; j++) {
+        for (int j = 1; j < rowCount - 1; j++) {
             QWidget *checkBoxWidget = new QWidget();
             QCheckBox *checkBox = new QCheckBox();
             QHBoxLayout *layoutCheckBox = new QHBoxLayout(checkBoxWidget);
@@ -53,6 +55,10 @@ MainWindow::MainWindow(QWidget *parent) :
         comboBox->setEnabled(false);
         comboBox->addItems(dataTypes);
         ui->tableWidget->setCellWidget(0, i, comboBox);
+
+        MathButton* mathButton = new MathButton("Σ");
+        connect(mathButton, SIGNAL(clicked(bool)), this, SLOT(mathButton_clicked()));
+        ui->tableWidget->setCellWidget(rowCount - 1, i, mathButton);
     }
     for (int i = 0; i < dataCount + 1; i++){
         ui->dataCount->addItem(QString::number(i));
@@ -66,7 +72,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->helpLabel->setText(help);
 
-    QTimer::singleShot(1, this, SLOT(on_actionSettings_triggered()));  //вывод окна ввода пользователя поверх главного окна
+    QTimer::singleShot(1, this, SLOT(on_actionSettings_triggered()));  //вывод окна настроек поверх главного окна
 }
 
 MainWindow::~MainWindow()
@@ -78,13 +84,17 @@ void MainWindow::dataProcessing()
 {
     if (device->isDataOk() && reqType == kHEXStandart) {
         for (auto it : graphPairs.keys()) {
+            MathButton *mathButton = static_cast<MathButton*>(ui->tableWidget->cellWidget(4, it));
+            float data = 0.0;
             if (std::string(device->getRData(it).typeName()) == std::string("uint24")) {
                 uint24 t = device->getRData(it).value<uint24>();
-                graphPairs.value(it)->setData(t.data);
+                data = t.data;
             }
             else {
-                graphPairs.value(it)->setData(device->getRData(it).toFloat());
+                data = device->getRData(it).toFloat();
             }
+            if (mathButton) data = mathButton->calc(data);
+            graphPairs.value(it)->setData(data);
         }
         for (auto it : bitMapper.keys()) {
             bitMapper.value(it)->setBitArray(device->getBitArray(it));
@@ -281,4 +291,14 @@ void MainWindow::on_standartProtocol_select_toggled(bool checked)
 void MainWindow::on_cycleSend_toggled(bool checked)
 {
     ui->intervalSpinBox->setEnabled(checked);
+}
+
+void MainWindow::mathButton_clicked()
+{
+    MathButton* button = qobject_cast<MathButton*>(sender());
+    if (button == nullptr) {
+        return;
+    }
+    std::shared_ptr<MathExpression> math_win(new MathExpression(button));
+    math_win->exec();
 }

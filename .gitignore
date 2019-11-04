@@ -1,6 +1,6 @@
 debug/
 release/
-BoardControl.pro.user
+BoardControl.pro.user*
 BoardControl_resource.rc
 .qmake.stash
 object_script*
